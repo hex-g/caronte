@@ -27,7 +27,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-  // We use caronte manager to validate the user credentials
+  // We use auth manager to validate the user credentials
   private AuthenticationManager authManager;
 
   private final JwtConfig jwtConfig;
@@ -37,7 +37,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
     this.jwtConfig = jwtConfig;
 
     // By default, UsernamePasswordAuthenticationFilter listens to "/login" path.
-    // In our case, we use "/caronte". So, we need to override the defaults.
+    // In our case, we use "/auth". So, we need to override the defaults.
     this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(jwtConfig.getUri(), "POST"));
   }
 
@@ -50,11 +50,11 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
       // 1. Get credentials from request
       UserCredentials creds = new ObjectMapper().readValue(request.getInputStream(), UserCredentials.class);
 
-      // 2. Create caronte object (contains credentials) which will be used by caronte manager
+      // 2. Create auth object (contains credentials) which will be used by auth manager
       UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
           creds.getUsername(), creds.getPassword(), Collections.emptyList());
 
-      // 3. Authentication manager authenticate the user, and use UserDetialsServiceImpl::loadUserByUsername() method to load the user.
+      // 3. Authentication manager authenticate the user, and use UserDetailsServiceImpl::loadUserByUsername() method to load the user.
       return authManager.authenticate(authToken);
 
     } catch (IOException e) {
@@ -63,7 +63,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
   }
 
   // Upon successful authentication, generate a token.
-  // The 'caronte' passed to successfulAuthentication() is the current authenticated user.
+  // The 'auth' passed to successfulAuthentication() is the current authenticated user.
   @Override
   protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
                                           Authentication auth) throws IOException, ServletException {

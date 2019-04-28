@@ -38,7 +38,7 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
         .antMatchers(HttpMethod.POST, jwtConfig.getUri()).permitAll()
         // FOR THE LOGGER - this shall disappear
-        .antMatchers(HttpMethod.GET, "/log/**").permitAll()
+        .antMatchers(HttpMethod.GET, "/log").permitAll()
         .anyRequest().authenticated();
   }
 
