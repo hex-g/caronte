@@ -1,6 +1,6 @@
-package hive.caronte.controller;
+package hive.caronte.log;
 
-import hive.caronte.log.Logger;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/")
 public class LoggerController {
-  @GetMapping("/log")
+  @GetMapping(value = "/log", produces = MediaType.TEXT_HTML_VALUE)
   public String getLog() {
     return Logger.instance.toHtmlTable();
   }

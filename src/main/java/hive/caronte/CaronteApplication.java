@@ -8,8 +8,6 @@ import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
 @EnableEurekaClient
-@EntityScan( basePackages = {"hive.ishigami.entity"} )
-@PropertySource("classpath:ishigami.properties")
 public class CaronteApplication {
 
   public static void main(String[] args) {

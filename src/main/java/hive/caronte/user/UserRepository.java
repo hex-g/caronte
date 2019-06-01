@@ -1,6 +1,5 @@
-package hive.caronte.repository;
+package hive.caronte.user;
 
-import hive.ishigami.entity.user.User;
 import org.springframework.data.repository.CrudRepository;
 
 public interface UserRepository extends CrudRepository<User, Integer> {
