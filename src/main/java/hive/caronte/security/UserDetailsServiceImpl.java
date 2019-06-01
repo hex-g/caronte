@@ -1,6 +1,6 @@
 package hive.caronte.security;
 
-import hive.caronte.repository.UserRepository;
+import hive.caronte.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
@@ -12,11 +12,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-  // -----------------------------------------------------------------------------------
-  // hardcode some users
-  private final BCryptPasswordEncoder encoder;
-  // -----------------------------------------------------------------------------------
-
   private final UserRepository userRepository;
 
   @Autowired
@@ -24,23 +19,23 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     this.userRepository = userRepository;
 
     // hardcode some users
-    userRepository.save(new hive.ishigami.entity.user.User("admin", encoder.encode("admin"), 0,0));
-    userRepository.save(new hive.ishigami.entity.user.User("ped", encoder.encode("ped"), 0,0));
-    userRepository.save(new hive.ishigami.entity.user.User("stu", encoder.encode("stu"), 0,0));
-    this.encoder = encoder;
+    userRepository.save(new hive.caronte.user.User("admin", encoder.encode("admin"), "ADMIN"));
+    userRepository.save(new hive.caronte.user.User("ped", encoder.encode("ped"), "PEDAGOGUE"));
+    userRepository.save(new hive.caronte.user.User("stu", encoder.encode("stu"), "STUDENT"));
   }
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    var hiveUser = userRepository.findByUsername(username);
+    final var hiveUser = userRepository.findByUsername(username);
 
     if (hiveUser == null) {
       throw new UsernameNotFoundException("Username: " + username + " not found");
     }
 
-    var grantedAuthorities =
+    final var grantedAuthorities =
         AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_" + hiveUser.getRole());
 
-    return new User(hiveUser.getUsername(), hiveUser.getPassword(), grantedAuthorities);
+    // return ID instead of username
+    return new User(hiveUser.getId().toString(), hiveUser.getPassword(), grantedAuthorities);
   }
 }

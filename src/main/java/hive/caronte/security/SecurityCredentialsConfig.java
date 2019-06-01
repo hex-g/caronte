@@ -1,13 +1,7 @@
 package hive.caronte.security;
 
-import javax.servlet.http.HttpServletResponse;
-
 import hive.pandora.security.JwtConfig;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,44 +10,44 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import javax.servlet.http.HttpServletResponse;
+
 @EnableWebSecurity
 public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
+  private final BCryptPasswordEncoder passwordEncoder;
+  private final UserDetailsService userDetailsService;
+  private final JwtConfig jwtConfig;
 
-  @Qualifier("userDetailsServiceImpl")
   @Autowired
-  private UserDetailsService userDetailsService;
-
-  @Autowired
-  private JwtConfig jwtConfig;
+  public SecurityCredentialsConfig(
+      final BCryptPasswordEncoder passwordEncoder,
+      final UserDetailsServiceImpl userDetailsService,
+      final JwtConfig jwtConfig
+  ) {
+    this.passwordEncoder = passwordEncoder;
+    this.userDetailsService = userDetailsService;
+    this.jwtConfig = jwtConfig;
+  }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http
-        .csrf().disable()
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .csrf()
+        .disable()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
-        .exceptionHandling().authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+        .exceptionHandling()
+        .authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED))
         .and()
-        .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig))
-        .authorizeRequests()
-        .antMatchers(HttpMethod.POST, jwtConfig.getUri()).permitAll()
-        // FOR THE LOGGER - this shall disappear
-        .antMatchers(HttpMethod.GET, "/log").permitAll()
-        .anyRequest().authenticated();
+        .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(
+            authenticationManager(),
+            jwtConfig
+        ));
   }
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-  }
-
-  @Bean
-  public JwtConfig jwtConfig() {
-    return new JwtConfig();
-  }
-
-  @Bean
-  public BCryptPasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
+    auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
   }
 }

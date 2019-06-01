@@ -47,7 +47,7 @@ public final class Logger {
       fillFromZeroToCurrentPosition(out);
     }
 
-    return out.toString();
+    return out.append("</table>").toString();
   }
 
   private void fillFromZeroToCurrentPosition(StringBuilder out) {
