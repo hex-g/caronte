@@ -15,13 +15,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   private final UserRepository userRepository;
 
   @Autowired
-  public UserDetailsServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder) {
+  public UserDetailsServiceImpl(UserRepository userRepository) {
     this.userRepository = userRepository;
-
-    // hardcode some users
-    userRepository.save(new hive.caronte.user.User("admin", encoder.encode("admin"), "ADMIN"));
-    userRepository.save(new hive.caronte.user.User("ped", encoder.encode("ped"), "PEDAGOGUE"));
-    userRepository.save(new hive.caronte.user.User("stu", encoder.encode("stu"), "STUDENT"));
   }
 
   @Override
